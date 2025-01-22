@@ -178,7 +178,7 @@ class My_handle(metaclass=SingletonMeta):
                     "custom_llm", "llm_tpu", "dify", "volcengine"]
 
             # 配置加载
-            self.config_load()
+            # self.config_load()
 
             logger.info(f"配置数据加载成功。")
 
@@ -508,24 +508,24 @@ class My_handle(metaclass=SingletonMeta):
         self.session_config = {'msg': [{"role": "system", "content": My_handle.config.get('chatgpt', 'preset')}]}
 
         # 设置GPT_Model全局模型列表
-        GPT_MODEL.set_model_config("openai", My_handle.config.get("openai"))
-        GPT_MODEL.set_model_config("chatgpt", My_handle.config.get("chatgpt"))
-        GPT_MODEL.set_model_config("claude", My_handle.config.get("claude"))  
+        # GPT_MODEL.set_model_config("openai", My_handle.config.get("openai"))
+        # GPT_MODEL.set_model_config("chatgpt", My_handle.config.get("chatgpt"))
+        # GPT_MODEL.set_model_config("claude", My_handle.config.get("claude"))  
 
         # 聊天相关类实例化
         self.handle_chat_type()
 
-        # 判断是否使能了SD
-        if My_handle.config.get("sd")["enable"]:
-            from utils.sd import SD
+        # # 判断是否使能了SD
+        # if My_handle.config.get("sd")["enable"]:
+        #     from utils.sd import SD
 
-            self.sd = SD(My_handle.config.get("sd"))
-        # 特殊：在SD没有使能情况下，判断图片映射是否使能
-        elif My_handle.config.get("key_mapping", "img_path_trigger_type") != "不启用":
-            # 沿用SD的虚拟摄像头来展示图片
-            from utils.sd import SD
+        #     self.sd = SD(My_handle.config.get("sd"))
+        # # 特殊：在SD没有使能情况下，判断图片映射是否使能
+        # elif My_handle.config.get("key_mapping", "img_path_trigger_type") != "不启用":
+        #     # 沿用SD的虚拟摄像头来展示图片
+        #     from utils.sd import SD
 
-            self.sd = SD({"enable": False, "visual_camera": My_handle.config.get("sd", "visual_camera")})
+        #     self.sd = SD({"enable": False, "visual_camera": My_handle.config.get("sd", "visual_camera")})
 
         # 日志文件路径
         self.log_file_path = "./log/log-" + My_handle.common.get_bj_time(1) + ".txt"
@@ -537,13 +537,13 @@ class My_handle(metaclass=SingletonMeta):
                 logger.info(f'{self.log_file_path} 日志文件已创建')
 
         # 生成弹幕文件
-        self.comment_file_path = "./log/comment-" + My_handle.common.get_bj_time(1) + ".txt"
-        if os.path.isfile(self.comment_file_path):
-            logger.info(f'{self.comment_file_path} 弹幕文件已存在，跳过')
-        else:
-            with open(self.comment_file_path, 'w') as f:
-                f.write('')
-                logger.info(f'{self.comment_file_path} 弹幕文件已创建')
+        # self.comment_file_path = "./log/comment-" + My_handle.common.get_bj_time(1) + ".txt"
+        # if os.path.isfile(self.comment_file_path):
+        #     logger.info(f'{self.comment_file_path} 弹幕文件已存在，跳过')
+        # else:
+        #     with open(self.comment_file_path, 'w') as f:
+        #         f.write('')
+        #         logger.info(f'{self.comment_file_path} 弹幕文件已创建')
 
         """                                                                                                                
                                                                                                                                         
@@ -640,37 +640,37 @@ class My_handle(metaclass=SingletonMeta):
 
 
     # 回传给webui，用于聊天内容显示
-    def webui_show_chat_log_callback(self, data_type: str, data: dict, resp_content: str):
-        """回传给webui，用于聊天内容显示
+    # def webui_show_chat_log_callback(self, data_type: str, data: dict, resp_content: str):
+    #     """回传给webui，用于聊天内容显示
 
-        Args:
-            data_type (str): 数据内容的类型（多指LLM）
-            data (dict): 数据JSON
-            resp_content (str): 显示的聊天内容的文本
-        """
-        try:
-            if My_handle.config.get("talk", "show_chat_log") == True: 
-                if "ori_username" not in data:
-                    data["ori_username"] = data["username"]
-                if "ori_content" not in data:
-                    data["ori_content"] = data["content"]
+    #     Args:
+    #         data_type (str): 数据内容的类型（多指LLM）
+    #         data (dict): 数据JSON
+    #         resp_content (str): 显示的聊天内容的文本
+    #     """
+    #     try:
+    #         if My_handle.config.get("talk", "show_chat_log") == True: 
+    #             if "ori_username" not in data:
+    #                 data["ori_username"] = data["username"]
+    #             if "ori_content" not in data:
+    #                 data["ori_content"] = data["content"]
                     
-                # 返回给webui的数据
-                return_webui_json = {
-                    "type": "llm",
-                    "data": {
-                        "type": data_type,
-                        "username": data["ori_username"], 
-                        "content_type": "answer",
-                        "content": f"错误：{data_type}无返回，请查看日志" if resp_content is None else resp_content,
-                        "timestamp": My_handle.common.get_bj_time(0)
-                    }
-                }
+    #             # 返回给webui的数据
+    #             return_webui_json = {
+    #                 "type": "llm",
+    #                 "data": {
+    #                     "type": data_type,
+    #                     "username": data["ori_username"], 
+    #                     "content_type": "answer",
+    #                     "content": f"错误：{data_type}无返回，请查看日志" if resp_content is None else resp_content,
+    #                     "timestamp": My_handle.common.get_bj_time(0)
+    #                 }
+    #             }
 
-                webui_ip = "127.0.0.1" if My_handle.config.get("webui", "ip") == "0.0.0.0" else My_handle.config.get("webui", "ip")
-                tmp_json = My_handle.common.send_request(f'http://{webui_ip}:{My_handle.config.get("webui", "port")}/callback', "POST", return_webui_json, timeout=30)
-        except Exception as e:
-            logger.error(traceback.format_exc())
+    #             webui_ip = "127.0.0.1" if My_handle.config.get("webui", "ip") == "0.0.0.0" else My_handle.config.get("webui", "ip")
+    #             tmp_json = My_handle.common.send_request(f'http://{webui_ip}:{My_handle.config.get("webui", "port")}/callback', "POST", return_webui_json, timeout=30)
+    #     except Exception as e:
+    #         logger.error(traceback.format_exc())
 
     # 获取房间号
     def get_room_id(self):
@@ -1444,11 +1444,11 @@ class My_handle(metaclass=SingletonMeta):
 
             logger.debug(message)
 
-            # 洛曦 直播弹幕助手
-            if My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "enable") and \
-                "reread" in My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "type") and \
-                "消息产生时" in My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "trigger_position"):
-                asyncio.run(send_msg_to_live_comment_assistant(My_handle.config.get("luoxi_project", "Live_Comment_Assistant"), content))
+            # # 洛曦 直播弹幕助手
+            # if My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "enable") and \
+            #     "reread" in My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "type") and \
+            #     "消息产生时" in My_handle.config.get("luoxi_project", "Live_Comment_Assistant", "trigger_position"):
+            #     asyncio.run(send_msg_to_live_comment_assistant(My_handle.config.get("luoxi_project", "Live_Comment_Assistant"), content))
 
             self.audio_synthesis_handle(message)
         except Exception as e:

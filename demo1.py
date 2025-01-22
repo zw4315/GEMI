@@ -2,7 +2,7 @@
 # -*- encoding: utf-8 -*-
 # Copyright FunASR (https://github.com/FunAudioLLM/SenseVoice). All Rights Reserved.
 #  MIT License  (https://opensource.org/licenses/MIT)
-import os, json, re
+import os, json, re, time
 
 from funasr import AutoModel
 from funasr.utils.postprocess_utils import rich_transcription_postprocess
@@ -54,21 +54,21 @@ def audio_listen(volume_threshold = 800.0, silence_threshold = 15):
 
     while True:
         # 播放中不录音
-        # if config.get("talk", "no_recording_during_playback"):
-        #     # 存在待合成音频 或 已合成音频还未播放 或 播放中 或 在数据处理中
-        #     if (
-        #         my_handle.is_audio_queue_empty() != 15
-        #         or my_handle.is_handle_empty() == 1
-        #         or wait_play_audio_num > 0
-        #     ):
-        #         time.sleep(
-        #             float(
-        #                 config.get(
-        #                     "talk", "no_recording_during_playback_sleep_interval"
-        #                 )
-        #             )
-        #         )
-        #         continue
+        if config.get("talk", "no_recording_during_playback"):
+            # 存在待合成音频 或 已合成音频还未播放 或 播放中 或 在数据处理中
+            if (
+                my_handle.is_audio_queue_empty() != 15
+                or my_handle.is_handle_empty() == 1
+                or wait_play_audio_num > 0
+            ):
+                time.sleep(
+                    float(
+                        config.get(
+                            "talk", "no_recording_during_playback_sleep_interval"
+                        )
+                    )
+                )
+                continue
 
         # 读取音频数据
         data = stream.read(CHUNK)
@@ -240,7 +240,13 @@ def talk_handle(content: str):
                             return False
 
                     # 传递给my_handle进行进行后续一系列的处理
-                    my_handle.process_data(data, "talk")
+                    # my_handle.process_data(data, "talk")
+                    response = ollama.chat(
+                      'qwen2.5:7b',
+                      messages=[{'role': 'user', 'content': data["content"]}]
+                    )
+                    data["content"] = response.message.content
+                    my_handle.reread_handle(data)
 
                     # 单次唤醒情况下，唤醒后关闭
                     if config.get("talk", "wakeup_sleep", "mode") == "单次唤醒":
@@ -419,6 +425,7 @@ if __name__ == "__main__":
 
     common = Common()
     config = Config(config_path)
+    my_handle = My_handle(config_path)
     # 日志文件路径
     log_path = "./log/log-" + common.get_bj_time(1) + ".txt"
 

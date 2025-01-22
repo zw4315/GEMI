@@ -1536,7 +1536,7 @@ class Audio:
                                     pygame.time.Clock().tick(10)
                                 Audio.mixer_normal.music.stop()
                                 
-                                await self.send_audio_play_info_to_callback()
+                                # await self.send_audio_play_info_to_callback()
                             except pygame.error as e:
                                 logger.error(traceback.format_exc())
                                 # 如果发生 pygame.error 异常，则捕获并处理它

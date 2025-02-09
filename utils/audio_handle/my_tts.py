@@ -15,7 +15,7 @@ class MY_TTS:
     def __init__(self, config_path):
         self.common = Common()
         self.config = Config(config_path)
-
+        self.melo_tts = None
         # 创建一个不执行证书验证的 SSLContext 对象
         self.ssl_context = ssl.create_default_context()
         self.ssl_context.check_hostname = False
@@ -363,8 +363,41 @@ class MY_TTS:
             logger.error(traceback.format_exc())
             logger.error(e)
             return None
-        
 
+    # 请求melo-TTS接口获取合成后的音频路径        
+    async def melo_tts_api(self, data):
+        try:
+            file_name = 'melo_tts_' + self.common.get_bj_time(4) + '.mp3'
+            voice_tmp_path = self.common.get_new_audio_path(self.audio_out_path, file_name)
+            # voice_tmp_path = './out/' + self.common.get_bj_time(4) + '.mp3'
+            # 过滤" '字符
+            data["content"] = data["content"].replace('"', '').replace("'", '')
+
+            speed = 1.0
+            device = 'cpu' # or cuda:0
+
+            # if self.melo_tts == None :
+            #     from melo.api import TTS
+            #     self.melo_tts = TTS(language='ZH', device=device)
+            # speaker_ids = self.melo_tts.hps.data.spk2id
+            # self.melo_tts.tts_to_file(data["content"], speaker_ids['ZH'], voice_tmp_path, speed=speed)
+
+            if self.melo_tts == None :
+                from kokoro import KPipeline
+                import soundfile as sf
+                self.melo_tts = KPipeline(lang_code='z')
+                self.sf = sf
+            generator = self.melo_tts(
+                data["content"], voice='zf_xiaobei', # <= change voice here
+                speed=1, split_pattern=r'\n+'
+            )
+            for i, (gs, ps, audio) in enumerate(generator):
+                self.sf.write(voice_tmp_path, audio, 24000) # save each audio file
+            return voice_tmp_path
+        except Exception as e:
+            logger.error(traceback.format_exc())
+            logger.error(e)
+            return None
     # 请求bark-gui的api
     def bark_gui_api(self, data):
         try:

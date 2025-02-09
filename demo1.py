@@ -89,12 +89,6 @@ def audio_listen(volume_threshold = 800.0, silence_threshold = 15):
 
     print("[语音录入完成]")
 
-    # 将音频保存为WAV文件
-    """with wave.open(WAVE_OUTPUT_FILENAME, 'wb') as wf:
-        wf.setnchannels(CHANNELS)
-        wf.setsampwidth(pyaudio.get_sample_size(FORMAT))
-        wf.setframerate(RATE)
-        wf.writeframes(b''.join(frames))"""
     return frames
 
 # 处理聊天逻辑 传入ASR后的文本内容
@@ -286,49 +280,14 @@ def do_listen_and_comment(status=True):
         #     return
 
         # 针对faster_whisper情况，模型加载一次共用，减少开销
-        if "faster_whisper" == config.get("talk", "type"):
-            # from faster_whisper import WhisperModel
-
-            # if faster_whisper_model is None:
-            #     logger.info("faster_whisper 模型加载中，请稍后...")
-            #     # Run on GPU with FP16
-            #     faster_whisper_model = WhisperModel(
-            #         model_size_or_path=config.get(
-            #             "talk", "faster_whisper", "model_size"
-            #         ),
-            #         device=config.get("talk", "faster_whisper", "device"),
-            #         compute_type=config.get(
-            #             "talk", "faster_whisper", "compute_type"
-            #         ),
-            #         download_root=config.get(
-            #             "talk", "faster_whisper", "download_root"
-            #         ),
-            #     )
-                logger.info("faster_whisper 模型加载完毕，可以开始说话了喵~")
-        elif "sensevoice" == config.get("talk", "type"):
+        if "sensevoice" == config.get("talk", "type"):
             from funasr import AutoModel
 
             logger.info("sensevoice 模型加载中，请稍后...")
             asr_model_path = config.get("talk", "sensevoice", "asr_model_path")
             vad_model_path = config.get("talk", "sensevoice", "vad_model_path")
             if sense_voice_model is None:
-                # sense_voice_model = AutoModel(
-                #     model=asr_model_path,
-                #     vad_model=vad_model_path,
-                #     vad_kwargs={
-                #         "max_single_segment_time": int(
-                #             config.get(
-                #                 "talk", "sensevoice", "vad_max_single_segment_time"
-                #             )
-                #         )
-                #     },
-                #     trust_remote_code=True,
-                #     device=config.get("talk", "sensevoice", "device"),
-                #     remote_code="./sensevoice/model.py",
-                # )
                 model_dir = "iic/SenseVoiceSmall"
-
-
                 sense_voice_model = AutoModel(
                     model=model_dir,
                     trust_remote_code=True,
@@ -444,44 +403,3 @@ if __name__ == "__main__":
     wait_play_audio_num = 0
     wait_synthesis_msg_num = 0
     do_listen_and_comment()
-
-# model_dir = "iic/SenseVoiceSmall"
-
-
-# model = AutoModel(
-#     model=model_dir,
-#     trust_remote_code=True,
-#     remote_code="./model.py",
-#     vad_model="fsmn-vad",
-#     vad_kwargs={"max_single_segment_time": 30000},
-#     device="cuda:0",
-# )
-
-# # en
-# res = model.generate(
-#     input=f"./1.mp3",
-#     cache={},
-#     language="auto",  # "zh", "en", "yue", "ja", "ko", "nospeech"
-#     use_itn=True,
-#     batch_size_s=60,
-#     merge_vad=True,  #
-#     merge_length_s=15,
-# )
-# text = rich_transcription_postprocess(res[0]["text"])
-# print(text)
-
-
-# response = ollama.chat(
-#   'qwen2.5:7b',
-#   messages=[{'role': 'user', 'content': text}]
-# )
-# print(response.message.content)
-
-
-# kokoro = Kokoro("./model/kokoro-v0_19.onnx", "./model/voices.json")
-# for voice in kokoro.get_voices():
-#     samples, sample_rate = kokoro.create(
-#         response.message.content, voice=voice, speed=1.0
-#     )
-#     sf.write(f"{voice}.wav", samples, sample_rate)
-#     break

@@ -984,6 +984,12 @@ class Audio:
 
                 # 调用接口合成语音
                 voice_tmp_path = await self.my_tts.edge_tts_api(data)
+            elif message["tts_type"] == "melo-tts":
+                data = {
+                    "content": message["content"],
+                    "edge-tts": message["data"]
+                }
+                voice_tmp_path = await self.my_tts.melo_tts_api(data)
             elif message["tts_type"] == "elevenlabs":
                 # 如果配置了密钥就设置上0.0
                 if message["data"]["api_key"] != "":

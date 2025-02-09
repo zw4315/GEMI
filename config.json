@@ -619,7 +619,7 @@
       "similarity": 0.5
     }
   },
-  "audio_synthesis_type": "edge-tts",
+  "audio_synthesis_type": "melo-tts",
   "audio_random_speed": {
     "normal": {
       "enable": false,
@@ -1035,7 +1035,7 @@
   "copywriting": {
     "text_path": "data/copywriting/test.txt",
     "audio_save_path": "out/copywriting/",
-    "audio_synthesis_type": "edge-tts",
+    "audio_synthesis_type": "melo-tts",
     "config": [
       {
         "file_path": "data/copywriting/",
@@ -1855,7 +1855,7 @@
   "assistant_anchor": {
     "enable": false,
     "username": "助播",
-    "audio_synthesis_type": "edge-tts",
+    "audio_synthesis_type": "melo-tts",
     "type": [
       "comment",
       "local_qa_audio",

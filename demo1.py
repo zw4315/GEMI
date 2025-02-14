@@ -14,7 +14,6 @@ from kokoro_onnx import Kokoro
 import pyaudio
 import wave
 import numpy as np
-from aip import AipSpeech
 
 from utils.my_log import logger
 from utils.common import Common

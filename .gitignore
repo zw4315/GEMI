@@ -169,3 +169,7 @@ cython_debug/
 
 # PyPI configuration file
 .pypirc
+
+#本地输出文件夹 + 日志文件夹
+/out
+/log
